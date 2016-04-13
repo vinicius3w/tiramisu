@@ -1,0 +1,62 @@
+%% Garcia's latex template for Activities Drescriptive Memorial Report
+%% Version 0.2
+%% (c) 2015 Vinicius Cardoso Garcia (vcg@cin.ufpe.br)
+%%
+%% This document is based on latex template from Prof. Daniel Cunha.
+%%
+%% Reference commands. Use the following commands to make references in your
+%% text:
+%%          \figref  -- for Figure reference
+%%          \tabref  -- for Table reference
+%%          \eqnref  -- for equation reference
+%%          \chapref -- for chapter reference
+%%          \secref  -- for section reference
+%%          \appref  -- for appendix reference
+%%          \axiref  -- for axiom reference
+%%          \conjref -- for conjecture reference
+%%          \defref  -- for definition reference
+%%          \lemref  -- for lemma reference
+%%          \theoref -- for theorem reference
+%%          \corref  -- for corollary reference
+%%          \propref -- for proprosition reference
+%%          \pgref   -- for page reference
+%%
+%%          Example: See \chapref{chap:introduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[a4paper,oneside,10pt]{article}
+
+\usepackage{graphicx}
+\usepackage{amsmath,amstext,amssymb,amsfonts}
+\usepackage[none]{hyphenat}
+\usepackage{fancyhdr}
+\usepackage{cite}
+\usepackage{indentfirst}
+%\usepackage{path}
+\usepackage[usenames, dvipsnames]{color}
+
+\usepackage{pdfsync}
+\usepackage{url}
+\usepackage{setspace}
+\usepackage[latin1,utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{colortbl}
+\newcommand{\SetRowColor}[1]{\noalign{\gdef\RowColorName{#1}}\rowcolor{\RowColorName}}
+
+\definecolor{MyRed}{rgb}{1,0.2,0.1}
+\definecolor{light-gray}{gray}{0.95}
+\definecolor{gray}{gray}{0.6}
+
+\usepackage{booktabs}
+\usepackage{ctable}
+\usepackage{setspace}
+\usepackage[multidot]{grffile}
+\usepackage[final]{pdfpages}
+
+\usepackage{titlesec}
+
+\usepackage[brazil]{babel}
+
+\usepackage[toc,page]{appendix}
+\newcommand{\appref}[1]{\@appendixname~\ref{#1}\xspace}
+%\usepackage{xifthen}

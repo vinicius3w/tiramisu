@@ -1,0 +1,167 @@
+%% Garcia's latex template for Activities Drescriptive Memorial Report
+%% Version 0.2
+%% (c) 2015 Vinicius Cardoso Garcia (vcg@cin.ufpe.br)
+%%
+%% This document is based on latex template from Prof. Daniel Cunha.
+%%
+%% Reference commands. Use the following commands to make references in your
+%% text:
+%%          \figref  -- for Figure reference
+%%          \tabref  -- for Table reference
+%%          \eqnref  -- for equation reference
+%%          \chapref -- for chapter reference
+%%          \secref  -- for section reference
+%%          \appref  -- for appendix reference
+%%          \axiref  -- for axiom reference
+%%          \conjref -- for conjecture reference
+%%          \defref  -- for definition reference
+%%          \lemref  -- for lemma reference
+%%          \theoref -- for theorem reference
+%%          \corref  -- for corollary reference
+%%          \propref -- for proprosition reference
+%%          \pgref   -- for page reference
+%%
+%%          Example: See \chapref{chap:introduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[a4paper,oneside,10pt]{article}
+
+\usepackage{graphicx}
+\usepackage{amsmath,amstext,amssymb,amsfonts}
+\usepackage[none]{hyphenat}
+\usepackage{fancyhdr}
+\usepackage{cite}
+\usepackage{indentfirst}
+%\usepackage{path}
+\usepackage[usenames, dvipsnames]{color}
+
+\usepackage{pdfsync}
+\usepackage{url}
+\usepackage{setspace}
+\usepackage[latin1,utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{colortbl}
+\newcommand{\SetRowColor}[1]{\noalign{\gdef\RowColorName{#1}}\rowcolor{\RowColorName}}
+
+\definecolor{MyRed}{rgb}{1,0.2,0.1}
+\definecolor{light-gray}{gray}{0.95}
+\definecolor{gray}{gray}{0.6}
+
+\usepackage{booktabs}
+\usepackage{ctable}
+\usepackage{setspace}
+\usepackage[multidot]{grffile}
+\usepackage[final]{pdfpages}
+
+\usepackage{titlesec}
+
+\usepackage[toc,page]{appendix}
+\newcommand{\appref}[1]{\@appendixname~\ref{#1}\xspace}
+%\usepackage{xifthen}
+
+\usepackage[bookmarks,colorlinks,pdfpagelabels,
+pdftitle={Memorial Descritivo de Atividades}, pdfauthor={Vinicius Cardoso Garcia}, pdfsubject={Solicita\c{c}\~{a}o de progress\~{a}o funcional docente de Adjunto N\'{\i}vel 3 para Adjunto N\'{\i}vel 4 apresentada \`{a} Comiss\~{a}o de Avalia\c{c}\~{a}o de Progress\~{a}o Horizontal do Centro de Inform\'{a}tica da Universidade Federal de Pernambuco.},
+pdfcreator={Vinicius Cardoso Garcia}, pdfkeywords={Progressão, Adjunto, UFPE, CIn, Docente, Horizontal}]{hyperref}
+
+\newcommand{\otoprule}{\midrule[\heavyrulewidth]}
+
+% Definicao de margens
+\setlength{\textwidth}{16cm} %
+\setlength{\textheight}{23cm} %
+\setlength{\oddsidemargin}{0cm} %
+\setlength{\evensidemargin}{0cm} %
+\setlength{\topmargin}{0cm}
+
+\renewcommand{\abstractname}{Resumo}
+\renewcommand{\contentsname}{\'{I}ndice Anal\'{\i}tico}
+\renewcommand{\refname}{Refer\^{e}ncias}
+\renewcommand{\appendixname}{Ap\^{e}ndice}
+\renewcommand{\tablename}{Tabela}
+
+%% Formatacao do cabecalho e rodape
+\lhead{\footnotesize Memorial Descritivo de Atividades} %
+\rhead{\footnotesize \emph{Vinicius Cardoso Garcia}} %
+\chead{} %
+\cfoot{} %
+\lfoot{\footnotesize\nouppercase\leftmark} %
+\rfoot{\bfseries\thepage}
+\renewcommand{\footrulewidth}{0.1pt}
+
+% Comando para inserir numero de documento
+\newcounter{document}%[section]
+\setcounter{document}{0}
+\renewcommand\theenumi{\arabic{section}.\arabic{enumi}}
+\newcommand\Doc{{\addtocounter{document}{1}\mbox{\sffamily\bfseries [Doc. \arabic{document}]}}}
+
+% Comando para repetir um numero de documento ja citado
+% \mbox{\sffamily{\bfseries{[Doc. XX]}}}
+
+%% Alternativa na edicao dos comandos.
+%% Comando para inserir numero de documento
+% \newcommand\thedocument{%
+%    \ifthenelse{\arabic{subsection}=0}
+%      {\thesection.\arabic{document}}
+%      {\thesubsection.\arabic{document}}}
+% \newcounter{document}[section]
+% \setcounter{document}{0}
+% \renewcommand\theenumi{\arabic{section}.\arabic{enumi}}
+% \ifthenelse{\arabic{subsection} = 0}{\newcommand\Doc{{\stepcounter{document}\bfseries [Doc. \arabic{section}.\arabic{document}]}}}{\newcommand\Doc{{\stepcounter{document}\bfseries [Doc. \arabic{section}.\arabic{subsection}.\arabic{document}]}}}
+% %\newcommand\Doc{{\addtocounter{document}{1}\mbox{\bfseries [Doc. \arabic{document}]}}}
+
+
+% Ambiente para centralizar vertical
+\newenvironment{vcenterpage}
+     {\newpage\vspace*{\fill}}
+     {\vspace*{\fill}\par\pagebreak}
+
+\sloppy
+
+\pagestyle{fancy}
+
+\setcounter{secnumdepth}{4}
+
+\begin{document}
+\pagenumbering{Alph}
+\begin{titlepage}
+
+\vspace{-5.0cm}
+
+\begin{figure}[!htb]
+ \centering{\includegraphics[scale=4.0]{logo2.eps}}
+ \label{fig:UFPE_logo}
+\end{figure}
+
+\begin{center}
+\vspace{1cm}
+%{\huge \textsf{Solicita\c{c}\~{a}o de Progress\~{a}o Funcional Docente}} \\[1cm]
+\rule{1.0\textwidth}{1pt} \\ [0.5cm]
+{\Huge \textbf{\textsf{Memorial Descritivo de Atividades}}} \\
+\rule{1.0\textwidth}{1pt} \\
+\vspace{2cm}
+
+\doublespacing
+{\Large \textsf{Solicita\c{c}\~{a}o de progress\~{a}o funcional docente de \textbf{Adjunto N\'{\i}vel 3 para Adjunto N\'{\i}vel 4} apresentada \`{a} Comiss\~{a}o de Avalia\c{c}\~{a}o de Progress\~{a}o Horizontal do Centro de Inform\'{a}tica da Universidade Federal de Pernambuco}}\\
+\vspace{1.5cm}
+{\LARGE \textsf{Solicitante: \textbf{Vinicius Cardoso Garcia}}}\\
+\vspace{0.5cm}
+{\Large \textsf{SIAPE: \textbf{1807586}}} \\
+\vspace{0.5cm}
+{\Large \textsf{Per\'{\i}odo: \textbf{20/08/2014 - 19/08/2016}}} \\
+
+\vspace{2.0cm}
+
+\normalsize \textsf{Setembro de 2016}
+
+\end{center}
+\thispagestyle{empty}
+\end{titlepage}
+\pagenumbering{arabic}
+
+\tableofcontents
+%\include{Lista_Anexos} \cleartooddpage[\thispagestyle{empty}]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% APRESENTACAO
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage
