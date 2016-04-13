@@ -1,3 +1,4 @@
+# encoding: UTF-8
 $KCODE = "UTF8" #encoding type do arquivo: utf-8 without boom
 require 'jcode'
 require 'rexml/document'

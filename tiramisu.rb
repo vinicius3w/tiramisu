@@ -203,6 +203,17 @@ def arquivoTeXFooter
   result << "%%% EOF \n"
 end
 
+def processaTextoParaTeX(texto)
+  map = {'ã' => '\\~{a}', 'õ' => '\\~{o}', 'à' => "\\`{a}", 'ç' => '\\c{c}',
+         'á' => "\\'{a}", 'é' => "\\'{e}", 'í' => "\\'{\\i}", 'ó' => "\\'{o}", 'ú' => "\\'{u}",
+         'â' => '\\^{a}', 'ê' => '\\^{e}', 'ô' => '\\^{o}',
+         '<' => '\\textless', '>' => '\\textgreater', '%' => '\\%', '$' => '\\$', '|' => '\\textbar', '#' => '\\#',
+         '&' => '\\&', '~' => '\\textasciitilde{}'
+  }
+  re = Regexp.new(map.keys.map { |x| Regexp.escape(x) }.join('|'))
+  result = texto.gsub(re, map)
+end
+
 def processaListaNomes(autores)
   if autores.size == 0 then
     ""
@@ -219,8 +230,9 @@ def processaNomeAutor(autor)
   match = /(\w+), (\w+)/.match(autor)
   if match then
     match[2].capitalize << " " << match[1].capitalize
+    processaTextoParaTeX(match)
   else
-    autor
+    processaTextoParaTeX(autor)
   end
 end
 
@@ -259,9 +271,9 @@ def processaOrientacoesEmAndamento(orientacoes, tipo)
   orientacoes.each{|a|
     map = extraiElemento(a,estrutura)
     #cv.puts "\\item #{map["NOME-DO-ORIENTANDO"]}. \\emph\{#{map["TITULO-DO-TRABALHO"]}\}. Tese de #{tipo.capitalize} em #{map["NOME-CURSO"]}, #{map["NOME-INSTITUICAO"]}, #{map["ANO"]}. #{processaCoOrientacao(map["TIPO-DE-ORIENTACAO"])} \\DOC\{#{referencia}\}"
-    result << "\\item       \\textbf{Aluno:} #{map["NOME-DO-ORIENTANDO"]} \\\\ \n"
-    result << "            \\textbf{T\\'{\\i}tulo:} #{map["TITULO-DO-TRABALHO"]}\\\\ \n"
-    result << "            \\textbf{Natureza:} #{map("NATUREZA")} em #{map["NOME-CURSO"]} \\\\ \n"
+    result << "\\item       \\textbf{Aluno:} #{processaTextoParaTeX(map["NOME-DO-ORIENTANDO"])} \\\\ \n"
+    result << "            \\textbf{T\\'{\\i}tulo:} #{processaTextoParaTeX(map["TITULO-DO-TRABALHO"])}\\\\ \n"
+    result << "            \\textbf{Natureza:} #{processaTextoParaTeX(map["NATUREZA"])} em #{processaTextoParaTeX(map["NOME-CURSO"])} \\\\ \n"
     if (tipo == "MESTRADO")
       if (map["TIPO"] == "ACADEMICO")
         result << "            \\textbf{Tipo:} Acad\\^{e}mico \\\\ \n"
@@ -271,7 +283,7 @@ def processaOrientacoesEmAndamento(orientacoes, tipo)
     end
     result << "            \\textbf{Data de In\\'{\\i}cio:} #{map["ANO"]} \\\\ \n"
     result << "            \\textbf{Supervis\\~{a}o:} #{processaCoOrientacao(map["TIPO-DE-ORIENTACAO"])} \\\\ \n"
-    result << "            \\textbf{Institui\\c{c}\\~{a}o:} #{map["NOME-INSTITUICAO"]}\n"
+    result << "            \\textbf{Institui\\c{c}\\~{a}o:} #{processaTextoParaTeX(map["NOME-INSTITUICAO"])}\n"
   }
 
   result
@@ -288,15 +300,15 @@ def processaOutrasOrientacoesConcluidas(orientacoes, tipo)
     map = extraiElemento(a,estrutura)
     #cv.puts "\\item #{map["NOME-DO-ORIENTADO"]}. #{map["TITULO"]}.  #{processaTipoOrientacao(tipo)}#{map["NOME-DO-CURSO"]}, #{map["NOME-DA-INSTITUICAO"]}, #{processaPagina(map["NUMERO-DE-PAGINAS"])}#{map["ANO"]}. #{processaCoOrientacao(map["TIPO-DE-ORIENTACAO-CONCLUIDA"])}#{processaAgencia(map["NOME-DA-AGENCIA"])} \\DOC\{#{referencia}\}"
 
-    result << "\\item       \\textbf{Aluno:} #{map["NOME-DO-ORIENTADO"]} \\\\ \n"
-    result << "            \\textbf{Curso/Institui\\c{c}\\~{a}o:} #{map["NOME-DO-CURSO"]}/#{map["NOME-DA-INSTITUICAO"]} \\\\ \n"
-    result << "            \\textbf{T\\'{\\i}tulo:} #{map["TITULO"]} \\\\ \n"
+    result << "\\item       \\textbf{Aluno:} #{processaTextoParaTeX(map["NOME-DO-ORIENTADO"])} \\\\ \n"
+    result << "            \\textbf{Curso/Institui\\c{c}\\~{a}o:} #{processaTextoParaTeX(map["NOME-DO-CURSO"])}/#{processaTextoParaTeX(map["NOME-DA-INSTITUICAO"])} \\\\ \n"
+    result << "            \\textbf{T\\'{\\i}tulo:} #{processaTextoParaTeX(map["TITULO"])} \\\\ \n"
     result << "            \\textbf{Supervis\\˜{a}:} #{processaCoOrientacao(tipo)} \\\\ \n"
     if(map["DESCRICAO-INFORMACOES-ADICIONAIS"] == "")
       result << "            \\textbf{Data da Conclus\\~{a}o:} #{map["ANO"]} \n"
     else
       result << "            \\textbf{Data da Conclus\\~{a}o:} #{map["ANO"]} \\\\ \n"
-      result << "            \\textbf{Informa\\c{c}\\~{o}es:} #{map["DESCRICAO-INFORMACOES-ADICIONAIS"]} \n"
+      result << "            \\textbf{Informa\\c{c}\\~{o}es:} #{processaTextoParaTeX(map["DESCRICAO-INFORMACOES-ADICIONAIS"])} \n"
     end
   }
 
@@ -313,15 +325,15 @@ def processaOutrasOrientacoesEmAndamento(orientacoes, tipo)
   orientacoes.each{|a|
     map = extraiElemento(a,estrutura)
     #cv.puts "\\item #{map["NOME-DO-ORIENTANDO"]}. \\emph\{#{map["TITULO-DO-TRABALHO"]}\}.  #{processaTipoOrientacao(map["NATUREZA"])}#{map["NOME-CURSO"]}, #{map["NOME-INSTITUICAO"]}, #{map["ANO"]}. #{processaAgencia(map["NOME-DA-AGENCIA"])} \\DOC\{#{referencia}\}"
-    result << "\\item       \\textbf{Aluno:} #{map["NOME-DO-ORIENTANDO"]} \\\\ \n"
-    result << "            \\textbf{Curso/Institui\\c{c}\\~{a}o:} #{map["NOME-CURSO"]}/#{map["NOME-INSTITUICAO"]} \\\\ \n"
-    result << "            \\textbf{T\\'{\\i}tulo:} #{map["TITULO-DO-TRABALHO"]} \\\\ \n"
+    result << "\\item       \\textbf{Aluno:} #{processaTextoParaTeX(map["NOME-DO-ORIENTANDO"])} \\\\ \n"
+    result << "            \\textbf{Curso/Institui\\c{c}\\~{a}o:} #{processaTextoParaTeX(map["NOME-CURSO"])}/#{processaTextoParaTeX(map["NOME-INSTITUICAO"])} \\\\ \n"
+    result << "            \\textbf{T\\'{\\i}tulo:} #{processaTextoParaTeX(map["TITULO-DO-TRABALHO"])} \\\\ \n"
     result << "            \\textbf{Supervis\\˜{a}:} #{processaCoOrientacao(tipo)} \\\\ \n"
     if(map["DESCRICAO-INFORMACOES-ADICIONAIS"] == "")
       result << "            \\textbf{Data da Conclus\\~{a}o:} #{map["ANO"]} \n"
     else
       result << "            \\textbf{Data da Conclus\\~{a}o:} #{map["ANO"]} \\\\ \n"
-      result << "            \\textbf{Informa\\c{c}\\~{o}es:} #{map["DESCRICAO-INFORMACOES-ADICIONAIS"]} \n"
+      result << "            \\textbf{Informa\\c{c}\\~{o}es:} #{processaTextoParaTeX(map["DESCRICAO-INFORMACOES-ADICIONAIS"])} \n"
     end
   }
   result
@@ -336,9 +348,9 @@ def processaOrientacoesConcluidas(orientacoes, tipo)
   orientacoes.each{|a|
     map = extraiElemento(a,estrutura)
     #cv.puts "\\item #{map["NOME-DO-ORIENTADO"]}. \\emph\{#{map["TITULO"]}\}. Tese de #{tipo.capitalize} em #{map["NOME-DO-CURSO"]}, #{map["NOME-DA-INSTITUICAO"]}, #{processaPagina(map["NUMERO-DE-PAGINAS"])}#{map["ANO"]}. #{processaCoOrientacao(map["TIPO-DE-ORIENTACAO"])} \\DOC\{#{referencia}\}"
-    result << "\\item       \\textbf{Aluno:} #{map["NOME-DO-ORIENTADO"]} \\\\ \n"
-    result << "            \\textbf{T\\'{\\i}tulo:} #{map["TITULO"]}\\\\ \n"
-    result << "            \\textbf{Natureza:} #{map["NATUREZA"]} em #{map["NOME-DO-CURSO"]} \\\\ \n"
+    result << "\\item       \\textbf{Aluno:} #{processaTextoParaTeX(map["NOME-DO-ORIENTADO"])} \\\\ \n"
+    result << "            \\textbf{T\\'{\\i}tulo:} #{processaTextoParaTeX(map["TITULO"])}\\\\ \n"
+    result << "            \\textbf{Natureza:} #{processaTextoParaTeX(map["NATUREZA"])} em #{processaTextoParaTeX(map["NOME-DO-CURSO"])} \\\\ \n"
     if (tipo == "MESTRADO")
       if (map["TIPO"] == "ACADEMICO")
         result << "            \\textbf{Tipo:} Acad\\^{e}mico \\\\ \n"
@@ -348,7 +360,7 @@ def processaOrientacoesConcluidas(orientacoes, tipo)
     end
     result << "            \\textbf{Data da Defesa:} #{map["ANO"]} \\\\ \n"
     result << "            \\textbf{Supervis\\~{a}o:} #{processaCoOrientacao(map["TIPO-DE-ORIENTACAO"])} \\\\ \n"
-    result << "            \\textbf{Institui\\c{c}\\~{a}o:} #{map["NOME-DA-INSTITUICAO"]}\n"
+    result << "            \\textbf{Institui\\c{c}\\~{a}o:} #{processaTextoParaTeX(map["NOME-DA-INSTITUICAO"])}\n"
   }
 
   result
@@ -363,11 +375,11 @@ def processaSupervisaoEstagioEmAndamento(orientacoes)
   orientacoes.each{|a|
     map = extraiElemento(a,estrutura)
 
-    result << "\\item       \\textbf{Aluno:} #{map["NOME-DO-ORIENTANDO"]}\\\\ \n"
-    result << "            \\textbf{Curso/Institui\\c{c}\\~{a}o:} #{map["NOME-CURSO"]}/#{map["NOME-INSTITUICAO"]}\\\\ \n"
+    result << "\\item       \\textbf{Aluno:} #{processaTextoParaTeX(map["NOME-DO-ORIENTANDO"])}\\\\ \n"
+    result << "            \\textbf{Curso/Institui\\c{c}\\~{a}o:} #{processaTextoParaTeX(map["NOME-CURSO"])}/#{processaTextoParaTeX(map["NOME-INSTITUICAO"])}\\\\ \n"
     #result << "            \\textbf{Instituição:} #{map["NOME-INSTITUICAO"]}\\\\ \n"
     #result << "            \\textbf{Natureza:} #{processaTipoOrientacao(map["NATUREZA"])}\\\\ \n"
-    result << "            \\textbf{Empresa:} #{map["TITULO-DO-TRABALHO"]}\\\\ \n"
+    result << "            \\textbf{Empresa:} #{processaTextoParaTeX(map["TITULO-DO-TRABALHO"])}\\\\ \n"
     result << "            \\textbf{Per\\'{\\i}odo:} #{map["ANO"]} \n"
   }
   result
@@ -384,9 +396,9 @@ def processaBancas(bancas, tipo)
     map = extraiElemento(a,estrutura)
 
     #cv.puts "\\item #{map["NOME-DO-CANDIDATO"]}. \\emph\{#{map["TITULO"]}\}.  #{processaTipoOrientacao(map["NATUREZA"])}#{map["NOME-CURSO"]}, #{map["NOME-INSTITUICAO"]}, #{map["ANO"]}. Examinadores: #{processaListaNomes(map["PARTICIPANTE-BANCA"].collect{|na| processaNomeAutor(na)})} \\DOC\{#{referencia}\}"
-    result << "\\item       \\textbf{Candidato:} #{map["NOME-DO-CANDIDATO"]}  \\\\ \n"
-    result << "            \\textbf{T\\'{\i}tulo da Tese:} #{map["TITULO"]}\\\\ \n"
-    result << "            \\textbf{Natureza:} #{processaTipoOrientacao(tipo)} #{map["NOME-CURSO"]} \\\\ \n"
+    result << "\\item       \\textbf{Candidato:} #{processaTextoParaTeX(map["NOME-DO-CANDIDATO"])}  \\\\ \n"
+    result << "            \\textbf{T\\'{\i}tulo da Tese:} #{processaTextoParaTeX(map["TITULO"])}\\\\ \n"
+    result << "            \\textbf{Natureza:} #{processaTipoOrientacao(tipo)} #{processaTextoParaTeX(map["NOME-CURSO"])} \\\\ \n"
     if (tipo == "MESTRADO")
       if (map["TIPO"] == "ACADEMICO")
         result << "            \\textbf{Tipo:} Acad\\^{e}mico \\\\ \n"
@@ -395,11 +407,11 @@ def processaBancas(bancas, tipo)
       end
     end
     if (tipo =="GRADUACAO")
-      result << "            \\textbf{Programa:} Gradua\\c{c}\\~{a}o em #{map["NOME-CURSO"]}\\\\ \n"
+      result << "            \\textbf{Programa:} Gradua\\c{c}\\~{a}o em #{processaTextoParaTeX(map["NOME-CURSO"])}\\\\ \n"
     else
-      result << "            \\textbf{Programa:} P\\'{o}s-Gradua\\c{c}\\~{a}o em #{map["NOME-CURSO"]}\\\\ \n"
+      result << "            \\textbf{Programa:} P\\'{o}s-Gradua\\c{c}\\~{a}o em #{processaTextoParaTeX(map["NOME-CURSO"])}\\\\ \n"
     end
-    result << "            \\textbf{Universidade:} #{map["NOME-INSTITUICAO"]}\\\\ \n"
+    result << "            \\textbf{Universidade:} #{processaTextoParaTeX(map["NOME-INSTITUICAO"])}\\\\ \n"
     result << "            \\textbf{Examinadores}: #{processaListaNomes(map["PARTICIPANTE-BANCA"].collect{|na| processaNomeAutor(na)})} \\\\ \n"
     result << "            \\textbf{Data:} #{map["ANO"]} \n"
   }
@@ -739,6 +751,54 @@ def orientacaoTrabalhoApoioAcademicoEmAndamento(documento)
 end
 
 # Subgrupo 1.2 - Participacao em Comissoes Examinadoras
+# Bancas Examinadoras de Concurso
+def bancasExaminadorasDeConcurso(documento, anos)
+  result = String.new("\n")
+
+  result << "\\subsubsection{Bancas Examinadoras de Concurso'} \n"
+  result << "\\vspace{0.3cm} \n"
+  result << " \n"
+
+  #bancas = selecionaBancas(documento, anos, "GRADUACAO")
+
+  if (bancas != []) then
+    result << "\\begin{enumerate}\n"
+    result << "\\renewcommand{\\labelenumi}{{\\large\\bfseries\\arabic{enumi}.}}\n"
+    #result << "\n"
+    #result << processaBancas(bancas,"GRADUACAO")
+  else
+    result << "Nada a declarar. \n"
+  end
+
+  result << "\n"
+  result << "\\end{enumerate} \n"
+end
+
+# Subgrupo 1.2 - Participacao em Comissoes Examinadoras
+# Bancas Congressos de Iniciacao Cientifica ou de Extensao
+def bancasCongressosIniciacaoOuExtensao(documento, anos)
+  result = String.new("\n")
+
+  result << "\\subsubsection{Bancas Congressos de Inicia\\c{c}\\~{a}o Cient\\'{i}fica ou de Extens\\~{a}o'} \n"
+  result << "\\vspace{0.3cm} \n"
+  result << " \n"
+
+  #bancas = selecionaBancas(documento, anos, "GRADUACAO")
+
+  if (bancas != []) then
+    result << "\\begin{enumerate}\n"
+    result << "\\renewcommand{\\labelenumi}{{\\large\\bfseries\\arabic{enumi}.}}\n"
+    #result << "\n"
+    #result << processaBancas(bancas,"GRADUACAO")
+  else
+    result << "Nada a declarar. \n"
+  end
+
+  result << "\n"
+  result << "\\end{enumerate} \n"
+end
+
+# Subgrupo 1.2 - Participacao em Comissoes Examinadoras
 # Bancas de Trabalho de Conclusao de Curso
 def bancasTrabalhoDeConclusaoDeCurso(documento, anos)
   result = String.new("\n")
@@ -865,31 +925,32 @@ categoriaProgressao = "Horizontal"
 #                 Subgrupo 1.1 - Orientacoes e Co-Orientacoes                 #
 ###############################################################################
 
-#puts supervisaoEstagioConcluido(doc)
+# TODO
+# puts supervisaoEstagioConcluido(doc, anos)
 
-#puts supervisaoEstagioEmAndamento(doc)
+# puts supervisaoEstagioEmAndamento(doc)
 
-#puts orientacaoDoutoradoConcluida(doc, anos)
+# puts orientacaoDoutoradoConcluida(doc, anos)
 
-#puts orientacaoDoutoradoEmAndamento(doc)
+# puts orientacaoDoutoradoEmAndamento(doc)
 
-#puts orientacaoMestradoConcluida(doc, anos)
+# puts orientacaoMestradoConcluida(doc, anos)
 
-#puts orientacaoMestradoEmAndamento(doc)
+# puts orientacaoMestradoEmAndamento(doc)
 
-#puts orientacaoTrabalhoConclusaoCursoConcluida(doc, anos)
+# puts orientacaoTrabalhoConclusaoCursoConcluida(doc, anos)
 
-#puts orientacaoTrabalhoConclusaoCursoEmAndamento(doc)
+# puts orientacaoTrabalhoConclusaoCursoEmAndamento(doc)
 
-#puts orientacaoMonitoriaConcluida("monitoria.tex")
+# puts orientacaoMonitoriaConcluida("monitoria.tex")
 
-#puts orientacaoIniciacaoCientificaConcluida(doc, anos)
+# puts orientacaoIniciacaoCientificaConcluida(doc, anos)
 
-#puts orientacaoIniciacaoCientificaEmAndamento(doc)
+# puts orientacaoIniciacaoCientificaEmAndamento(doc)
 
-#puts orientacaoTrabalhoApoioAcademicoConcluido(doc, anos)
+# puts orientacaoTrabalhoApoioAcademicoConcluido(doc, anos)
 
-#puts orientacaoTrabalhoApoioAcademicoEmAndamento(doc)
+# puts orientacaoTrabalhoApoioAcademicoEmAndamento(doc)
 
 ###############################################################################
 #            Subgrupo 1.2 - Participacao em Comissoes Examinadoras            #
@@ -901,7 +962,7 @@ categoriaProgressao = "Horizontal"
 # TODO
 #puts bancasCongressosIniciacaoOuExtensao(doc, anos)
 
-#puts bancasTrabalhoDeConclusaoDeCurso(doc, anos)
+puts bancasTrabalhoDeConclusaoDeCurso(doc, anos)
 
 #puts bancasDissertacaoDeMestrado(doc, anos)
 
