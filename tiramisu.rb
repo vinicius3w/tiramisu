@@ -203,15 +203,25 @@ def processa_final_arquivo_TeX
   result << "%%% EOF \n"
 end
 
+# Este metodo apresenta problemas quando o nome do autor vem no formato "Sobrenome, Nome", ou seja, quando a string
+# do nome do autor possui uma virgula porque o metodo <gsub> utilizado para a substituicao dos caracteres especiais
+# nao funciona para pedacos de strings.
 def processa_texto_para_TeX(texto)
   map = {'ã' => '\\~{a}', 'õ' => '\\~{o}', 'à' => "\\`{a}", 'ç' => '\\c{c}',
          'á' => "\\'{a}", 'é' => "\\'{e}", 'í' => "\\'{\\i}", 'ó' => "\\'{o}", 'ú' => "\\'{u}",
          'â' => '\\^{a}', 'ê' => '\\^{e}', 'ô' => '\\^{o}',
+         'Ã' => '\\~{A}', 'Õ' => '\\~{O}', 'À' => "\\`{A}", 'Ç' => '\\c{C}',
+         'Á' => "\\'{A}", 'É' => "\\'{E}", 'Í' => "\\'{\\I}", 'Ó' => "\\'{O}", 'Ú' => "\\'{U}",
+         'Â' => '\\^{A}', 'Ê' => '\\^{E}', 'Ô' => '\\^{O}',
          '<' => '\\textless', '>' => '\\textgreater', '%' => '\\%', '$' => '\\$', '|' => '\\textbar', '#' => '\\#',
          '&' => '\\&', '~' => '\\textasciitilde{}', "_" => " "
   }
   re = Regexp.new(map.keys.map { |x| Regexp.escape(x) }.join('|'))
-  result = texto.gsub(re, map)
+  if(texto.nil?)
+    result = texto
+  else
+    result = texto.gsub(re, map)
+  end
 end
 
 def processa_paginas(pgi, pgf)
@@ -301,8 +311,8 @@ def processa_trabalhos_periodicos(artigos)
     map = extrai_elemento(a, estrutura)
     fasc = if (map["FASCICULO"] != "") then "(#{map["FASCICULO"]})" else "" end
     #cv.puts "\\item #{processaListaNomes(map["AUTORES"].collect{|na| processaNomeAutor(na)})}. \\emph\{#{map["TITULO-DO-ARTIGO"]}\}. #{map["TITULO-DO-PERIODICO-OU-REVISTA"]}, volume #{map["VOLUME"]}#{fasc}, #{processaPaginas(map["PAGINA-INICIAL"],map["PAGINA-FINAL"])}#{map["ANO-DO-ARTIGO"]}. \\DOC\{#{referencia}\}"
+    result << "\\item #{processa_lista_nomes(map["AUTORES"].collect{|na| processa_nome_autor(na)})}. \\textbf\{#{processa_texto_para_TeX(map["TITULO-DO-ARTIGO"])}\}. #{processa_texto_para_TeX(map["TITULO-DO-PERIODICO-OU-REVISTA"])}, volume #{map["VOLUME"]}#{fasc}, #{processa_paginas(map["PAGINA-INICIAL"], map["PAGINA-FINAL"])}#{map["ANO-DO-ARTIGO"]}. \n"
   }
-  result << "\\item #{processa_lista_nomes(map["AUTORES"].collect{|na| processa_nome_autor(na)})}. \\textbf\{#{processa_texto_para_TeX(map["TITULO-DO-ARTIGO"])}\}. #{processa_texto_para_TeX(map["TITULO-DO-PERIODICO-OU-REVISTA"])}, volume #{map["VOLUME"]}#{fasc}, #{processa_paginas(map["PAGINA-INICIAL"], map["PAGINA-FINAL"])}#{map["ANO-DO-ARTIGO"]}. \n"
   result
 end
 
@@ -1165,127 +1175,346 @@ categoria_origem = "Adjunto N\'{i}vel 3"
 categoria_destino = "Adjunto N\'{i}vel 4"
 categoria_progressao = "Horizontal"
 
-#puts arquivoTeXHeader(doc.elements[0].elements[0].attr("NOME-COMPLETO").to_s, siape, anos, data_inicio, data_fim,
-#      categoria_origem, categoria_destino, categoria_progressao)
+# r - Abre o arquivo para leitura;
+# w - Abre o arquivo para escrita;
+# a - Anexa ao final do arquivo, caso você queira escrever no final do arquivo;
+# r+ - Abre o arquivo para leitura e escrita;
+# w+ - Cria um arquivo vazio para leitura e escrita;
+# a+ - Abre o arquivo para leitura e anexação, ou seja, você pode ler qualquer parte do arquivo, mas só pode escrever
+# no final do arquivo.
+memorial = File.open("#{siape}.tex", "w+:utf-8" )
 
-#puts arquivoTeXPresentation(doc.elements[0].elements[0].attr("NOME-COMPLETO").to_s, departamento, data_inicio, data_fim,
-#      categoria_origem, categoria_destino, categoria_progressao)
+# --------------------------------------------------------- #
+
+# memorial.puts processa_inicio_arquivo_TeX(doc.elements[1].elements[1].attributes["NOME-COMPLETO"].to_s, siape, anos, data_inicio, data_fim, categoria_origem, categoria_destino, categoria_progressao)
+
+# memorial.puts processa_apresentacao_arquivo_TeX(doc.elements[1].elements[1].attributes["NOME-COMPLETO"].to_s, departamento, data_inicio, data_fim, categoria_origem, categoria_destino, categoria_progressao)
 
 ###############################################################################
 #                       Grupo 1 - Atividades de Ensino                        #
 ###############################################################################
 
+# memorial.puts "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+# memorial.puts "% Grupo 1 - Atividades de Ensino"
+# memorial.puts "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+# memorial.puts "\\newpage"
+# memorial.puts "\\section{Atividades de Ensino}"
+# memorial.puts ""
+# memorial.puts "%A seguir, listo as atividades de ensino que realizei no periodo, separadas por subgrupo, conforme rege o documento tal."
+# memorial.puts ""
+
 ###############################################################################
 #                 Subgrupo 1.1 - Orientacoes e Co-Orientacoes                 #
 ###############################################################################
 
+# memorial.puts ""
+# memorial.puts "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+# memorial.puts "% Subgrupo 1.1 - Orientacoes e Co-Orientacoes"
+# memorial.puts "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+# memorial.puts ""
+
 # TODO
-# puts supervisao_estagio_concluido(doc, anos)
+# memorial.puts supervisao_estagio_concluido(doc, anos)
+# memorial.puts ""
+# memorial.puts "%------------------------------------------------------------------------------"
+# memorial.puts ""
 
-# puts supervisao_estagio_em_andamento(doc)
+# memorial.puts(supervisao_estagio_em_andamento(doc))
+# memorial.puts ""
+# memorial.puts "%------------------------------------------------------------------------------"
+# memorial.puts ""
 
-# puts orientacao_doutorado_concluida(doc, anos)
-
-# puts orientacao_doutorado_em_andamento(doc)
-
-# puts orientacao_mestrado_concluida(doc, anos)
-
-# puts orientacao_mestrado_em_andamento(doc)
-
-# puts orientacao_trabalho_conclusao_curso_concluida(doc, anos)
-
-# puts orientacao_trabalho_conclusao_curso_em_andamento(doc)
-
-# puts orientacao_monitoria_concluida("monitoria.tex")
-
-# puts orientacao_iniciacao_cientifica_concluida(doc, anos)
-
-# puts orientacao_iniciacao_cientifica_em_andamento(doc)
-
-# puts orientacao_trabalho_apoio_academico_concluido(doc, anos)
-
-# puts orientacao_trabalho_apoio_academico_em_andamento(doc)
+# memorial.puts ""
+# memorial.puts "%------------------------------------------------------------------------------"
+# memorial.puts ""
+# memorial.puts "\\subsection{Orienta\\c{c}\\~{o}es e Co-Orienta\\c{c}\\~{o}es}"
+# memorial.puts "\\vspace{0.3cm}"
+# memorial.puts ""
+# memorial.puts "%------------------------------------------------------------------------------"
+# memorial.puts ""
+#
+# memorial.puts orientacao_doutorado_concluida(doc, anos)
+# memorial.puts ""
+# memorial.puts "%------------------------------------------------------------------------------"
+# memorial.puts ""
+#
+# memorial.puts orientacao_doutorado_em_andamento(doc)
+# memorial.puts ""
+# memorial.puts "%------------------------------------------------------------------------------"
+# memorial.puts ""
+#
+# memorial.puts orientacao_mestrado_concluida(doc, anos)
+# memorial.puts ""
+# memorial.puts "%------------------------------------------------------------------------------"
+# memorial.puts ""
+#
+# memorial.puts orientacao_mestrado_em_andamento(doc)
+# memorial.puts ""
+# memorial.puts "%------------------------------------------------------------------------------"
+# memorial.puts ""
+#
+# memorial.puts orientacao_trabalho_conclusao_curso_concluida(doc, anos)
+# memorial.puts ""
+# memorial.puts "%------------------------------------------------------------------------------"
+# memorial.puts ""
+#
+# memorial.puts orientacao_trabalho_conclusao_curso_em_andamento(doc)
+# memorial.puts ""
+# memorial.puts "%------------------------------------------------------------------------------"
+# memorial.puts ""
+#
+# memorial.puts orientacao_monitoria_concluida("monitoria.tex")
+# memorial.puts ""
+# memorial.puts "%------------------------------------------------------------------------------"
+# memorial.puts ""
+#
+# memorial.puts orientacao_iniciacao_cientifica_concluida(doc, anos)
+# memorial.puts ""
+# memorial.puts "%------------------------------------------------------------------------------"
+# memorial.puts ""
+#
+# memorial.puts orientacao_iniciacao_cientifica_em_andamento(doc)
+# memorial.puts ""
+# memorial.puts "%------------------------------------------------------------------------------"
+# memorial.puts ""
+#
+# memorial.puts orientacao_trabalho_apoio_academico_concluido(doc, anos)
+# memorial.puts ""
+# memorial.puts "%------------------------------------------------------------------------------"
+# memorial.puts ""
+#
+# memorial.puts orientacao_trabalho_apoio_academico_em_andamento(doc)
 
 ###############################################################################
 #            Subgrupo 1.2 - Participacao em Comissoes Examinadoras            #
 ###############################################################################
 
-# TODO
-# puts participacao_em_bancas_examinadoras_de_concurso(doc, anos)
+# memorial.puts ""
+# memorial.puts "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+# memorial.puts "% Subgrupo 1.2 - Participacao em Comissoes Examinadoras"
+# memorial.puts "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+# memorial.puts ""
+# memorial.puts ""
+# memorial.puts "\\subsection{Participa\\c{c}\\~{a}o em Comiss\\~{o}es Examinadoras}"
+# memorial.puts "\\vspace{0.3cm}"
+# memorial.puts ""
 
 # TODO
-# puts participacao_em_bancas_congressos_iniciacao_ou_extensao(doc, anos)
-
-# puts participacao_em_bancas_trabalho_de_conclusao_de_curso(doc, anos)
-
-# puts participacao_em_bancas_dissertacao_de_mestrado(doc, anos)
-
-# puts participacao_em_bancas_qualificacao_de_doutorado(doc, anos)
-
-# puts participacao_em_bancas_tese_de_doutorado(doc, anos)
+# memorial.puts participacao_em_bancas_examinadoras_de_concurso(doc, anos)
+# memorial.puts ""
+# memorial.puts "%------------------------------------------------------------------------------"
+# memorial.puts ""
 
 # TODO
-# puts participacao_em_bancas_selecao_pos_graduacao(doc, anos)
+# memorial.puts participacao_em_bancas_congressos_iniciacao_ou_extensao(doc, anos)
+# memorial.puts ""
+# memorial.puts "%------------------------------------------------------------------------------"
+# memorial.puts ""
+
+# memorial.puts participacao_em_bancas_trabalho_de_conclusao_de_curso(doc, anos)
+# memorial.puts ""
+# memorial.puts "%------------------------------------------------------------------------------"
+# memorial.puts ""
+#
+# memorial.puts participacao_em_bancas_dissertacao_de_mestrado(doc, anos)
+# memorial.puts ""
+# memorial.puts "%------------------------------------------------------------------------------"
+# memorial.puts ""
+#
+# memorial.puts participacao_em_bancas_qualificacao_de_doutorado(doc, anos)
+# memorial.puts ""
+# memorial.puts "%------------------------------------------------------------------------------"
+# memorial.puts ""
+#
+# memorial.puts participacao_em_bancas_tese_de_doutorado(doc, anos)
+# memorial.puts ""
+# memorial.puts "%------------------------------------------------------------------------------"
+# memorial.puts ""
+
+# TODO
+# memorial.puts participacao_em_bancas_selecao_pos_graduacao(doc, anos)
 
 ###############################################################################
 #     Subgrupo 1.3 - Atividades de Ensino na Graduacao e na Pos-Graduacao     #
 ###############################################################################
 
-# puts atividades_de_ensino_graduacao_e_pos_graduacao("disciplinas.tex")
+# memorial.puts ""
+# memorial.puts "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+# memorial.puts "% Subgrupo 1.3 - Atividades de Ensino na Graduacao e na Pos-Graduacao"
+# memorial.puts "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+# memorial.puts ""
+# memorial.puts "\\subsection{Atividades de Ensino na Gradua\\c{c}\\~{a}o e na P\\'{o}s-Gradua\\c{c}\\~{a}o}"
+# memorial.puts "\\vspace{0.3cm}"
+# memorial.puts ""
+#
+# memorial.puts atividades_de_ensino_graduacao_e_pos_graduacao("disciplinas.tex")
 
 ###############################################################################
 #           Subgrupo 1.4 - Avaliacao Didatica Docente pelo Discente           #
 ###############################################################################
 
-# puts avaliacao_docente_pelo_discente("avaliacaodocente.tex")
+# memorial.puts "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+# memorial.puts "% Subgrupo 1.4 - Avaliacao Didatica Docente pelo Discente"
+# memorial.puts "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+# memorial.puts ""
+# memorial.puts "\\vspace{5.0cm}"
+# memorial.puts ""
+#
+# memorial.puts avaliacao_docente_pelo_discente("avaliacaodocente.tex")
 
 ###############################################################################
 # Grupo 2: Atividades de Producao Cientifica e Tecnica, Artistica e Cultural  #
 ###############################################################################
 
+# memorial.puts "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+# memorial.puts "% Grupo 2 - Atividades de Producao Cientifica e Tecnica, Artistica e Cultural"
+# memorial.puts "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+# memorial.puts "\\newpage"
+# memorial.puts "\\section{Atividades de Produ\\c{c}\\~{a}o Cient\\'{\\i}fica e T\\'{e}cnica, Art\\'{\\i}stica e Cultural}"
+# memorial.puts ""
+
 ###############################################################################
 #                  Subgrupo 2.1 - Produtividade de Pesquisa                   #
 ###############################################################################
 
-# TODO
-# puts bolsista_produtividade(doc, anos)
+# memorial.puts "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+# memorial.puts "% Subgrupo 2.1 - Produtividade de Pesquisa"
+# memorial.puts "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+# memorial.puts ""
+# memorial.puts "\\subsection{Produtividade de Pesquisa}"
+# memorial.puts "\\vspace{0.3cm}"
 
 # TODO
-# puts participacao_em_eventos_cientificos(doc, anos)
+# memorial.puts bolsista_produtividade(doc, anos)
+# memorial.puts ""
+# memorial.puts "%------------------------------------------------------------------------------"
+# memorial.puts ""
 
 # TODO
-# puts autoria_artigos_completos(doc, anos)
+# memorial.puts participacao_em_eventos_cientificos(doc, anos)
+# memorial.puts ""
+# memorial.puts "%------------------------------------------------------------------------------"
+# memorial.puts ""
 
-#TODO
-puts participacao_em_projetos_aprovados(doc, anos)
+# TODO
+# memorial.puts autoria_artigos_completos(doc, anos)
+# memorial.puts ""
+# memorial.puts "%------------------------------------------------------------------------------"
+# memorial.puts ""
 
+# TODO
+# memorial.puts participacao_em_projetos_aprovados(doc, anos)
+# memorial.puts ""
+# memorial.puts "%------------------------------------------------------------------------------"
+# memorial.puts ""
 
+# TODO
+# memorial.puts consultoria_a_instituicoes_de_fomento(doc, anos)
+# memorial.puts ""
+# memorial.puts "%------------------------------------------------------------------------------"
+# memorial.puts ""
+
+# TODO
+# memorial.puts premios_recebidos(doc, anos)
 
 ###############################################################################
 #                     Subgrupo 2.2 - Producao Cientifica                      #
 ###############################################################################
+# memorial.puts ""
+# memorial.puts "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+# memorial.puts "% Subgrupo 2.2 - Producao Cientifica"
+# memorial.puts "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+# memorial.puts ""
+# memorial.puts "\\subsection{Produ\\c{c}\\~{a}o Cient\\'{\\i}fica}"
+# memorial.puts "\\vspace{0.3cm}"
 
-
+# TODO
+# memorial.puts autoria_de_trabalhos_em_periodicos(doc, anos)
+puts autoria_de_trabalhos_em_periodicos(doc, ["2015"])
 
 ###############################################################################
 #                       Grupo 3 - Atividades de Extensao                      #
 ###############################################################################
+# memorial.puts ""
+# memorial.puts "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+# memorial.puts "% Grupo 3 - Atividades de Extensao"
+# memorial.puts "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+# memorial.puts "\\newpage"
+# memorial.puts "\\section{Atividades de Extens\\~{a}o}"
+# memorial.puts ""
 
 ###############################################################################
 #                   Subgrupo 3.1 - Coordenacao e Orientacao                   #
 ###############################################################################
+# memorial.puts "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+# memorial.puts "% Subgrupo 3.1 - Coordenacao e Orientacao"
+# memorial.puts "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+# memorial.puts ""
+# memorial.puts "\\subsection{Coordena\\c{c}\\~{a}o e Orienta\\c{c}\\~{a}o}"
+# memorial.puts "\\vspace{0.3cm}"
+
+# TODO
+# memorial.puts coordenacao_orientacao_projetos_extensao(doc, anos)
 
 ###############################################################################
 #            Subgrupo 3.2 - Coordenacao de Eventos e Conferencista            #
 ###############################################################################
+# memorial.puts ""
+# memorial.puts "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+# memorial.puts "% Subgrupo 3.2 - Coordenacao de Eventos e Conferencista"
+# memorial.puts "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+# memorial.puts ""
+# memorial.puts "\\subsection{Coordena\\c{c}\\~{a}o de Eventos e Conferencista}"
+# memorial.puts "\\vspace{0.3cm}"
+
+# TODO
+# memorial.puts coordenacao_de_eventos_e_conferencista
 
 ###############################################################################
 #          Grupo 4 - Atividades de Formacao e Capacitacao Academica           #
 ###############################################################################
+# memorial.puts ""
+# memorial.puts "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+# memorial.puts "% Grupo 4 - Atividades de Formacao e Capacitacao Academica"
+# memorial.puts "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+# memorial.puts "\\newpage"
+# memorial.puts "\\section{Atividades de Forma\\c{c}\\~{a}o e Capacita\\c{c}\\~{a}o Acad\\^{e}mica}"
+# memorial.puts ""
+
+# TODO
+# memorial.puts atualizacao_cursos_capacitacao(doc, anos)
 
 ###############################################################################
 #                     Grupo 5 - Atividades Administrativas                    #
 ###############################################################################
+# memorial.puts ""
+# memorial.puts "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+# memorial.puts "% Grupo 5 - Atividades Administrativas"
+# memorial.puts "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+# memorial.puts "\\newpage"
+# memorial.puts "\\section{Atividades Administrativas}"
+# memorial.puts ""
 
+# TODO
+# memorial.puts membro_de_comissao_temporaria(doc, anos)
+# memorial.puts ""
+# memorial.puts "%------------------------------------------------------------------------------"
+# memorial.puts ""
 
-# puts processa_final_arquivo_TeX
+# TODO
+# memorial.puts membro_de_NDE(doc, anos)
+# memorial.puts ""
+# memorial.puts "%------------------------------------------------------------------------------"
+# memorial.puts ""
+
+# TODO
+# memorial.puts membro_colegiado_de_curso(doc, anos)
+# memorial.puts ""
+# memorial.puts "%------------------------------------------------------------------------------"
+# memorial.puts ""
+
+# --------------------------------------------------------- #
+
+memorial.puts processa_final_arquivo_TeX
+
+memorial.close
