@@ -3,7 +3,7 @@ require 'jcode' if RUBY_VERSION < '1.9'
 require 'rexml/document'
 #require 'nokogiri'
 
-def includeFile(fileName)
+def include_file(fileName)
   saida = ""
   File.open(fileName) do |file|
     while line = file.gets
@@ -501,6 +501,28 @@ def processa_participacao_em_bancas(bancas, tipo)
   result
 end
 
+def processa_participacao_em_bancas_julgadoras(bancas, tipo)
+  result = String.new("\n")
+  estrutura = {"DADOS-BASICOS-DA-BANCA-JULGADORA-PARA-" << tipo =>
+                   ["TITULO", "ANO", "NATUREZA"],
+               "DETALHAMENTO-DA-BANCA-JULGADORA-PARA-" << tipo =>
+                   ["NOME-INSTITUICAO"],
+               "PARTICIPANTE-BANCA" => ["*", "NOME-COMPLETO-DO-PARTICIPANTE-DA-BANCA"]}
+  bancas.each{|a|
+    map = extrai_elemento(a, estrutura)
+
+    #cv.puts "\\item #{map["NOME-DO-CANDIDATO"]}. \\emph\{#{map["TITULO"]}\}.  #{processaTipoOrientacao(map["NATUREZA"])}#{map["NOME-CURSO"]}, #{map["NOME-INSTITUICAO"]}, #{map["ANO"]}. Examinadores: #{processaListaNomes(map["PARTICIPANTE-BANCA"].collect{|na| processaNomeAutor(na)})} \\DOC\{#{referencia}\}"
+    result << "\\item       \\textbf{Natureza:} #{processa_texto_para_TeX(map["NATUREZA"])}  \\\\ \n"
+    result << "            \\textbf{Descri\\c{c}\\~{a}o:} #{processa_texto_para_TeX(map["TITULO"])}\\\\ \n"
+    #result << "            \\textbf{Natureza:} #{processa_tipo_orientacao(tipo)} #{processa_texto_para_TeX(map["NOME-CURSO"])} \\\\ \n"
+
+    result << "            \\textbf{Universidade:} #{processa_texto_para_TeX(map["NOME-INSTITUICAO"])}\\\\ \n"
+    result << "            \\textbf{Examinadores}: #{processa_lista_nomes(map["PARTICIPANTE-BANCA"].collect{|na| processa_nome_autor(na)})} \\\\ \n"
+    result << "            \\textbf{Data:} #{map["ANO"]} \n"
+  }
+  result
+end
+
 def seleciona_elementos_por_ano(vitae, anos, elemento, subelemento, attributoAno)
   seleciona_elementos_por_ano_e_condicao(vitae, anos, elemento, subelemento, attributoAno){|db| true}
 end
@@ -539,6 +561,10 @@ end
 
 def seleciona_participacao_em_bancas(documento, anos, tipo)
   seleciona_elementos_por_ano(documento, anos, "//PARTICIPACAO-EM-BANCA-DE-" << tipo, "DADOS-BASICOS-DA-PARTICIPACAO-EM-BANCA-DE-" << tipo, "ANO")
+end
+
+def seleciona_participacao_em_bancas_julgadoras(documento, anos, tipo)
+  seleciona_elementos_por_ano(documento, anos, "//BANCA-JULGADORA-PARA-CONCURSO-PUBLICO", "DADOS-BASICOS-DA-BANCA-JULGADORA-PARA-" << tipo, "ANO")
 end
 
 def seleciona_outras_orientacoes_em_andamento(vitae, tipo)
@@ -753,7 +779,7 @@ end
 def orientacao_monitoria_concluida(arquivo)
   result = String.new("\n")
 
-  result << includeFile("#{arquivo}")
+  result << include_file("#{arquivo}")
 end
 
 # Subgrupo 1.1 - Orientacoes e Co-Orientacoes
@@ -857,13 +883,13 @@ def participacao_em_bancas_examinadoras_de_concurso(documento, anos)
   result << "\\vspace{0.3cm} \n"
   result << " \n"
 
-  #bancas = selecionaBancas(documento, anos, "GRADUACAO")
+  bancas = seleciona_participacao_em_bancas_julgadoras(documento, anos, "CONCURSO-PUBLICO")
 
   if (bancas != []) then
     result << "\\begin{enumerate}\n"
     result << "\\renewcommand{\\labelenumi}{{\\large\\bfseries\\arabic{enumi}.}}\n"
-    #result << "\n"
-    #result << processaBancas(bancas,"GRADUACAO")
+    result << "\n"
+    result << processa_participacao_em_bancas_julgadoras(bancas,"CONCURSO-PUBLICO")
   else
     result << "Nada a declarar. \n"
   end
@@ -997,13 +1023,13 @@ end
 def atividades_de_ensino_graduacao_e_pos_graduacao(arquivo)
   result = String.new("\n")
 
-  result << includeFile("#{arquivo}")
+  result << include_file("#{arquivo}")
 end
 
 def avaliacao_docente_pelo_discente(arquivo)
 result = String.new("\n")
 
-result << includeFile("#{arquivo}")
+result << include_file("#{arquivo}")
 end
 
 # TODO
@@ -1155,7 +1181,8 @@ end
 #doc.encoding = "utf-8"
 doc = REXML::Document.new(File.open("vitaeCNPq.xml"))
 
-anos = ["2014", "2015", "2016"]
+#anos = ["2014", "2015", "2016"]
+anos = ["2010", "2011", "2012"]
 
 siape = "1807586"
 departamento = "Departamento de Informa\\c{c}\\~{a}o e Sistemas"
@@ -1210,8 +1237,7 @@ categoria_progressao = "Horizontal"
 #            Subgrupo 1.2 - Participacao em Comissoes Examinadoras            #
 ###############################################################################
 
-# TODO
-# puts participacao_em_bancas_examinadoras_de_concurso(doc, anos)
+#puts participacao_em_bancas_examinadoras_de_concurso(doc, anos)
 
 # TODO
 # puts participacao_em_bancas_congressos_iniciacao_ou_extensao(doc, anos)
@@ -1257,7 +1283,7 @@ categoria_progressao = "Horizontal"
 # puts autoria_artigos_completos(doc, anos)
 
 #TODO
-puts participacao_em_projetos_aprovados(doc, anos)
+#puts participacao_em_projetos_aprovados(doc, anos)
 
 
 
